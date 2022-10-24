@@ -1,0 +1,51 @@
+const int AIN1 = 7;
+const int AIN2 = 8;
+const int PWMA = 9;
+const int STICK = A0;
+int speed_cmd;
+#define TringPin 5
+#define EchoPin 3
+
+float ProDelay = 0;
+float Distance = 0;
+void setup() {
+  // put your setup code here, to run once:
+pinMode(AIN1,OUTPUT);
+pinMode(AIN2, OUTPUT);
+pinMode(PWMA,OUTPUT);
+Serial.begin( 9600 );
+  pinMode( TringPin, OUTPUT);
+  pinMode( EchoPin, INPUT);
+  pinMode(11,OUTPUT);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  digitalWrite(TringPin,HIGH);
+  delayMicroseconds(10);
+  digitalWrite( TringPin, LOW);
+
+  ProDelay = pulseIn(EchoPin,HIGH);
+
+  if (ProDelay > 0){
+    Distance = 340*ProDelay/20000  ;
+    Serial.print("Distance:");
+    Serial.print(Distance);
+    Serial.println(" cm");
+  }
+
+if (Distance < 50){
+  speed_cmd = map(Distance, 0, 50, 0, 511);
+if(speed_cmd >= 0){
+  digitalWrite(AIN1,HIGH);
+  digitalWrite(AIN2, LOW);
+  analogWrite(PWMA, map(speed_cmd, 0, 511, 0, 255));
+}else{
+  digitalWrite(AIN1, LOW);
+  digitalWrite(AIN2,HIGH);
+  analogWrite(PWMA, map(-speed_cmd, 0, 511, 0,255));
+}
+
+}
+
+}
